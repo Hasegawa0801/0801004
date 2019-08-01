@@ -1,85 +1,62 @@
 <?php
- 
-$accessToken = 'ScsOQvzkti43X3SBf2XcpZvZAVDM/mHaNHrAOJfr+5eu7Gz8BoxQMljmW0y5NHpazyckMfKUETP53ZccURy7OjMcD7cIJNFhjCx4gM+pFGx3Vip4+j436klae2PR9MlQYD4uHuCsunVINo/cg/sa4QdB04t89/1O/w1cDnyilFU=';
+// まずは HTTPステータス 200 を返す
+http_response_code(200) ;
+echo '200 {}';
 
-//ユーザーからのメッセージ取得
+// 送られて来たJSONデータを取得
 $json_string = file_get_contents('php://input');
-$json_object = json_decode($json_string);
- 
-//取得データ
-$replyToken = $json_object->{"events"}[0]->{"replyToken"};        //返信用トークン
-$message_type = $json_object->{"events"}[0]->{"message"}->{"type"};    //メッセージタイプ
-$message_text = $json_object->{"events"}[0]->{"message"}->{"text"};    //メッセージ内容
-$message_id = $json_object->{"events"}[0]->{"message"}->{"id"};
- 
-//メッセージタイプが「text」以外のときは何も返さず終了
-if($message_type != "text") exit;
+$json = json_decode($json_string);
+// JSONデータから返信先を取得
+$replyToken = $json->events[0]->replyToken;
+// JSONデータから送られてきたメッセージを取得
+$message = $json->events[0]->message->text;
 
-/*
+// HTTPヘッダを設定
+$channelToken = 'ScsOQvzkti43X3SBf2XcpZvZAVDM/mHaNHrAOJfr+5eu7Gz8BoxQMljmW0y5NHpazyckMfKUETP53ZccURy7OjMcD7cIJNFhjCx4gM+pFGx3Vip4+j436klae2PR9MlQYD4uHuCsunVINo/cg/sa4QdB04t89/1O/w1cDnyilFU=';
+$headers = [
+	'Authorization: Bearer ' . $channelToken,
+	'Content-Type: application/json; charset=utf-8',
+];
 
-//画像ファイルのバイナリ取得
-$ch = curl_init("https://api.line.me/v2/bot/message/".$message_id."/content");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array(
- 'Content-Type: application/json; charser=UTF-8',
- 'Authorization: Bearer ' . $accessToken
- ));
+// POSTデータを設定してJSONにエンコード
+$post = [
+	'replyToken' => $replyToken,
+	'messages' => [
+		[
+			'type' => 'text',
+			'text' => '「' . $message . '」',
+		],
+	],
+];
+$post = json_encode($post);
+
+// HTTPリクエストを設定
+$ch = curl_init('https://api.line.me/v2/bot/message/reply');
+$options = [
+	CURLOPT_CUSTOMREQUEST => 'POST',
+	CURLOPT_HTTPHEADER => $headers,
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_BINARYTRANSFER => true,
+	CURLOPT_HEADER => true,
+	CURLOPT_POSTFIELDS => $post,
+];
+
+// 実行
+curl_setopt_array($ch, $options);
+
+// エラーチェック
 $result = curl_exec($ch);
-curl_close($ch);
-
-//画像ファイルの作成  
-$fp = fopen('./img/test.jpg', 'wb');
-
-if ($fp){
-    if (flock($fp, LOCK_EX)){
-        if (fwrite($fp,  $result ) === FALSE){
-            print('ファイル書き込みに失敗しました<br>');
-        }else{
-            print($data.'をファイルに書き込みました<br>');
-        }
-
-        flock($fp, LOCK_UN);
-    }else{
-        print('ファイルロックに失敗しました<br>');
-    }
+$errno = curl_errno($ch);
+if ($errno) {
+	return;
 }
 
-fclose($fp);
+// HTTPステータスを取得
+$info = curl_getinfo($ch);
+$httpStatus = $info['http_code'];
 
-*/
- 
-//返信メッセージ
-$return_message_text = $message_text;
- 
-//返信実行
-sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
-?>
-<?php
-//メッセージの送信
-function sending_messages($accessToken, $replyToken, $message_type, $return_message_text){
-    //レスポンスフォーマット
-    $response_format_text = [
-        "type" => $message_type,
-        "text" => $return_message_text
-    ];
- 
-    //ポストデータ
-    $post_data = [
-        "replyToken" => $replyToken,
-        "messages" => [$response_format_text]
-    ];
- 
-    //curl実行
-    $ch = curl_init("https://api.line.me/v2/bot/message/reply");
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json; charser=UTF-8',
-        'Authorization: Bearer ' . $accessToken
-    ));
-    $result = curl_exec($ch);
-    curl_close($ch);
-}
-?>
+$responseHeaderSize = $info['header_size'];
+$body = substr($result, $responseHeaderSize);
+
+// 200 だったら OK
+echo $httpStatus . ' ' . $body;
