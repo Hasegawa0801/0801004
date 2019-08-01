@@ -1,7 +1,5 @@
 <?php
  
-$accessToken = '<?php
- 
 $accessToken = 'piMkvlrypWCQ7BW0w1kK+KmvS/U3qezdKmChtQYgYrJKD12unIu2rbqbQzy8ayQnNaw6U2k8jtt22FVejaDu+KddX2CXmXa7QYyIuCXlGkiX01oLh9OfAWTIdka4aqje/3FFomQR0gTImfEFX1KCrAdB04t89/1O/w1cDnyilFU=';
 
 //ユーザーからのメッセージ取得
