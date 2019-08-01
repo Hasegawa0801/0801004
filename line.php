@@ -18,7 +18,7 @@ if($json_string){
     if($message_type != "text") exit;
 
     //返信メッセージ
-    $return_message_text = "「" . $message_text . "」なの？";
+    $return_message_text = "「" . $message_text . "」";
 
     //返信実行
     sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
