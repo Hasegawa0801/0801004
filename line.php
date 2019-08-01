@@ -13,7 +13,9 @@ $message_text = $json_object->{"events"}[0]->{"message"}->{"text"};    //メッ�
 $message_id = $json_object->{"events"}[0]->{"message"}->{"id"};
  
 //メッセージタイプが「text」以外のときは何も返さず終了
-// if($message_type != "text") exit;
+if($message_type != "text") exit;
+
+/*
 
 //画像ファイルのバイナリ取得
 $ch = curl_init("https://api.line.me/v2/bot/message/".$message_id."/content");
@@ -44,12 +46,13 @@ if ($fp){
 
 fclose($fp);
 
+*/
  
 //返信メッセージ
-// $return_message_text = $message_text;
+$return_message_text = $message_text;
  
 //返信実行
-// sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
+sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
 ?>
 <?php
 //メッセージの送信
