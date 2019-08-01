@@ -5,10 +5,10 @@
 $api_key = "AIzaSyBH1al8YcGfWHdrVSHGzwxXuIUekMZzPdM" ;
 
 // 画像へのパス
-$image_path = 'https://qiita-image-store.s3.amazonaws.com/0/105205/b1282d63-42ee-c870-69f1-575e222cd06c.jpeg';
+$image_path = 'http://k.yimg.jp/images/top/sp2/cmn/logo-ns-131205.png';
 
 // Feature Type
-$feature = LABEL_DETECTION;
+$feature = LOGO_DETECTION;
 
 // パラメータ設定
 $param = array("requests" => array());
