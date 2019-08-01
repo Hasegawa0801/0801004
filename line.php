@@ -21,7 +21,7 @@ if($json_string){
     $return_message_text = "「" . $message_text . "」なの？";
 
     //返信実行
-    $this->sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
+    sending_messages($accessToken, $replyToken, $message_type, $return_message_text);
 }
 
 function sending_messages($accessToken, $replyToken, $message_type, $return_message_text){
